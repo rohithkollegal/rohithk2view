@@ -16,12 +16,6 @@ stages:
         out:
           value:
             schema: string
-      TDMDB_SCHEMA:
-        parent: FabricSetRead
-        in:
-          key:
-            const: TDMDB_SCHEMA
-            default: false
       LuID:
         parent: Const
         in:
@@ -36,6 +30,23 @@ stages:
         in:
           key:
             const: AI_ENVIRONMENT
+      beID:
+        parent: Const
+        in:
+          value:
+            const: null
+            external: beID
+        out:
+          value:
+            schema: string
+      getTDMDBSchema:
+        parent: InnerFlow
+        in:
+          flowName:
+            const: getTDMDBSchema
+        out:
+          schema:
+            schema: string
   Get Inputs:
     actors:
       luName:
@@ -95,6 +106,25 @@ stages:
             const: null
             link: AI_ENVIRONMENT/result
             default: false
+      isParamCoupling:
+        parent: Const
+        in:
+          value:
+            const: null
+            external: isParamCoupling
+        out:
+          value:
+            schema: string
+      BE_ID:
+        parent: FabricSet
+        in:
+          key:
+            const: BE_ID
+            default: false
+          value:
+            const: null
+            link: beID/value
+            default: false
   Check MDB EXPORT Schema:
     actors:
       Get k2system Schema Name:
@@ -112,19 +142,20 @@ stages:
         in:
           format:
             const: select iid as IID from ${k2system}.entity_list where task_execution_id=${task_execution_id}
+              and task_type='GENERATION'
           task_execution_id:
             link: taskExecutionID/value
             schema: string
             mandatory: false
           k2system:
             link: Get k2system Schema Name/result
-            schema: any
+            schema: string
             mandatory: false
       Broadway Command Sync And Export:
         parent: StringFormat
         in:
           format:
-            const: broadway ${luName}.ImportFromGenerationJob IID=?,luName=${luName},loadIndicator=${loadIndicator}
+            const: broadway ${luName}.ImportFromGenerationJob IID=?,luName=${luName},loadIndicator=${loadIndicator},isParamCoupling=${isParamCoupling}
           luName:
             link: luName/value
             schema: string
@@ -132,6 +163,10 @@ stages:
           loadIndicator:
             link: loadIndicator   /value
             schema: boolean
+            mandatory: false
+          isParamCoupling:
+            link: isParamCoupling/value
+            schema: string
             mandatory: false
   Batch:
     dependsOn: Entity List
@@ -271,7 +306,7 @@ stages:
             schema: string
             mandatory: false
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
     split: '--------------------'
@@ -306,7 +341,7 @@ stages:
             schema: string
             mandatory: false
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
   Output:

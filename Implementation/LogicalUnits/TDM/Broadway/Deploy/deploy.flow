@@ -7,18 +7,40 @@ stages:
         in:
           key:
             const: TDM_DEPLOY_ENVIRONMENTS
+            default: false
+      PROJECT_DIR:
+        parent: SysEnv
+        in:
+          name:
+            const: PROJECT_DIR
+        out:
+          value:
+            schema: string
   If True:
     dependsOn: Check Flag For Deploy Envs
     actors:
-      'True':
-        parent: EqualsIgnoreCase
+      JavaScript1:
+        parent: JavaScript
         condition: result
         in:
-          b:
-            const: 'true'
-            schema: string
-          a:
+          script:
+            const: |-
+              var result = true;
+              if (deployFlag != "true" || projectDir == null || projectDir == "") {
+                  result = false;
+              }
+              result;
+          deployFlag:
             link: TDM_DEPLOY_ENVIRONMENTS/result
+            schema: string
+            mandatory: false
+          projectDir:
+            link: PROJECT_DIR/value
+            schema: string
+            mandatory: false
+        out:
+          result:
+            schema: boolean
     split: '--------------------'
   If Flase:
     else: true
@@ -40,14 +62,6 @@ stages:
           value:
             const: DEPLOY ENVIRONMENTS FROM FILE '
             schema: string
-        out:
-          value:
-            schema: string
-      PROJECT_DIR:
-        parent: SysEnv
-        in:
-          name:
-            const: PROJECT_DIR
         out:
           value:
             schema: string
@@ -113,6 +127,20 @@ stages:
         in:
           flowName:
             const: AddWebRole
+  Create K2System If Relevant:
+    actors:
+      create K2system Schema:
+        parent: InnerFlow
+        in:
+          flowName:
+            const: createK2systemSchema
+  Check If Upgrade TDM version Needed:
+    actors:
+      TDMDBUpgradeScripts1:
+        parent: InnerFlow
+        in:
+          flowName:
+            const: TDMDBUpgradeScripts
   'Create Postgres Databases ':
     actors:
       createPGDBS:
@@ -170,8 +198,8 @@ stages:
               interfaceType:
               - database
               - CassandraLoader
-              interfaces:
-              - fabric
+              interfaces: [
+                ]
             mandatory: false
           dropKeySpace:
             link: SEQ_DROP_KEYSPACE/result

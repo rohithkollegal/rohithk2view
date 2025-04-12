@@ -96,7 +96,7 @@ public class SharedGlobals {
 
 	@category("TDM")
 	public static final String TDMDB_SCHEMA = "public";
-
+	
 	@category("TDM")
 	public static String clone_id = "0";
 
@@ -104,7 +104,7 @@ public class SharedGlobals {
 	public static String LOAD_MASKING_FLAG = "false";
 
 	@category("TDM")
-	public static String TDM_SUMMARY_REPORT_LIMIT = "10000";
+	public static final String TDM_SUMMARY_REPORT_LIMIT = "10000";
 
 	@category("TDM")
 	public static final String TDM_DELETE_TABLES_PREFIX = "TAR_";
@@ -159,5 +159,23 @@ public class SharedGlobals {
 
     @category("TDM")
 	public static String TDM_DELETE_ONLY_TASK = "false";
+
+    @category("TDM")
+	public static String TDM_SUPPRESS_TEST_CONNECTION = "false";
+
+    @category("TDM")
+	public static final String POP_FULL_LU_HIERARCHY_IN_TDM_LU = "true";
+	
+	@category("TDM")
+	public static String UPDATE_MDB_EXPORTED_SCHEMA = "false";
+
+	@category("TDM")
+	public static String REPLACE_SEQ_BY_LUI_SYNC = "false";
+
+	@category("TDM")
+	public static String TDM_USING_CATALOG_SEQUENCES = "false";
+
+	@category("TDM")
+	public static String CREATE_PHYSICAL_FK_IN_MDB_EXPORT_SCHEMA= "true";
 
 }

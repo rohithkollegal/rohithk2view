@@ -14,12 +14,6 @@ stages:
           key:
             const: TDM_LU_NAME
             default: false
-      TDMDB_SCHEMA:
-        parent: FabricSetRead
-        in:
-          key:
-            const: TDMDB_SCHEMA
-            default: false
       Now:
         parent: Now
       AI_DB_K2SYSTEM:
@@ -27,6 +21,14 @@ stages:
         in:
           key:
             const: AI_DB_INTERFACE
+      getTDMDBSchema:
+        parent: InnerFlow
+        in:
+          flowName:
+            const: getTDMDBSchema
+        out:
+          schema:
+            schema: string
   Set Task execution List:
     actors:
       Update task_execution_summary:
@@ -38,7 +40,7 @@ stages:
             const: update ${@TDMDB_SCHEMA}.task_execution_summary set execution_status
               = 'failed' where task_execution_id =${execution_id} ;
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
           execution_id:
@@ -50,6 +52,14 @@ stages:
         in:
           date:
             link: Now/date
+      Getk2SystemSchemaName:
+        parent: InnerFlow
+        in:
+          flowName:
+            const: Getk2SystemSchemaName
+        out:
+          result:
+            schema: string
       Get Status:
         parent: DbCommand
         in:
@@ -65,14 +75,6 @@ stages:
         out:
           result:
             schema: '#ref'
-      Getk2SystemSchemaName:
-        parent: InnerFlow
-        in:
-          flowName:
-            const: Getk2SystemSchemaName
-        out:
-          result:
-            schema: string
   Set Task Execution Summary:
     dependsOn: Set Task execution List
     actors:
@@ -101,7 +103,7 @@ stages:
             mandatory: false
           k2system:
             link: Getk2SystemSchemaName/result
-            schema: any
+            schema: string
             mandatory: false
         out:
           result:
@@ -155,7 +157,7 @@ stages:
                   (task_type != 'TRAINING' AND process_id <= 0)
               );
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
           execution_id:
@@ -172,11 +174,11 @@ stages:
             const: update ${@k2system}.task_executions set status='FAILED' where id=${id}
           k2system:
             link: Getk2SystemSchemaName/result
-            schema: any
+            schema: string
             mandatory: false
           id:
             link: TDM_TASK_EXE_ID/result
-            schema: any
+            schema: string
             mandatory: false
   'Update Task Exe Error Summary    ':
     actors:
@@ -187,7 +189,7 @@ stages:
             const: TDM
           schema:
             const: null
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
           table:
             const: task_exe_error_summary
           fields:
@@ -218,8 +220,10 @@ stages:
             schema: string
             mandatory: false
           lu_name:
+            const: ''
             link: TDM_LU_NAME/result
             schema: string
+            default: true
             mandatory: false
           error_category:
             const: AI
@@ -261,7 +265,7 @@ stages:
             const: TDM
           schema:
             const: null
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
           table:
             const: task_exe_error_detailed
           fields:
@@ -286,8 +290,10 @@ stages:
             schema: string
             mandatory: false
           lu_name:
+            const: ''
             link: TDM_LU_NAME/result
             schema: string
+            default: true
             mandatory: false
           entity_id:
             const: ''
@@ -337,13 +343,6 @@ stages:
           actor_parameters:
             schema: '#ref'
             mandatory: false
-  Throw Execption:
-    actors:
-      Fail:
-        parent: Fail
-        in:
-          message:
-            const: The AI Process Has Failed
 schemas:
   Get Status.out.result:
     type: array

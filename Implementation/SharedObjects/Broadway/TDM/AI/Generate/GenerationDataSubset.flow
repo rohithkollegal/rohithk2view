@@ -64,12 +64,14 @@ stages:
         out:
           value:
             schema: string
-      TDMDB_SCHEMA:
-        parent: FabricSetRead
+      getTDMDBSchema:
+        parent: InnerFlow
         in:
-          key:
-            const: TDMDB_SCHEMA
-            default: false
+          flowName:
+            const: getTDMDBSchema
+        out:
+          schema:
+            schema: string
       LuID:
         parent: Const
         in:
@@ -107,15 +109,6 @@ stages:
             schema: '#ref'
   check Schema:
     actors:
-      createMDBExportSchema:
-        parent: InnerFlow
-        in:
-          flowName:
-            const: createMDBExportSchema
-          luName:
-            external: luName
-            schema: string
-            mandatory: false
       namespace:
         parent: StringFormat
         in:
@@ -183,7 +176,7 @@ stages:
             schema: string
             mandatory: false
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
   Execute Generate Task:
@@ -198,7 +191,7 @@ stages:
             schema: string
             mandatory: false
           generation_image:
-            const: europe-west3-docker.pkg.dev/k2view-medoid/medoid/k2view-sdg-generation-task:1.0.5
+            const: europe-west3-docker.pkg.dev/k2view-medoid/medoid/k2view-sdg-generation-task:2.1.2
             schema: string
             mandatory: false
           id:
@@ -231,6 +224,10 @@ stages:
             mandatory: false
           task_id:
             link: taskExecutionID/value
+            schema: string
+            mandatory: false
+          task_type:
+            const: GENERATION
             schema: string
             mandatory: false
         out:
@@ -280,7 +277,7 @@ stages:
             schema: string
             mandatory: false
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
   AI Task Failed:

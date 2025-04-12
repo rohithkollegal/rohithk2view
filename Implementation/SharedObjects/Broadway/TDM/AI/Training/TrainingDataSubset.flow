@@ -64,12 +64,14 @@ stages:
         in:
           string:
             link: luName/value
-      TDMDB_SCHEMA:
-        parent: FabricSetRead
+      getTDMDBSchema:
+        parent: InnerFlow
         in:
-          key:
-            const: TDMDB_SCHEMA
-            default: false
+          flowName:
+            const: getTDMDBSchema
+        out:
+          schema:
+            schema: string
       'Format the current date to load it ':
         parent: DateFormat
         in:
@@ -223,7 +225,7 @@ stages:
             schema: string
             mandatory: false
           storage-size:
-            const: 200Gi
+            const: 50Gi
             schema: string
             default: true
             mandatory: false
@@ -239,7 +241,7 @@ stages:
             schema: string
             mandatory: false
           training_image:
-            const: europe-west3-docker.pkg.dev/k2view-medoid/medoid/k2view-sdg-training-task:1.0.5
+            const: europe-west3-docker.pkg.dev/k2view-medoid/medoid/k2view-sdg-training-task:2.1.2
             schema: string
             mandatory: false
           id:
@@ -281,7 +283,7 @@ stages:
             const: "UPDATE ${@TDMDB_SCHEMA}.task_execution_list\r\n\tSET   execution_status='running'\r\
               \n\tWHERE task_execution_id=${EXEID} and lu_id=${lu_id} and process_id=-1;"
           TDMDB_SCHEMA:
-            link: TDMDB_SCHEMA/result
+            link: getTDMDBSchema/schema
             schema: string
             mandatory: false
           EXEID:
@@ -318,6 +320,10 @@ stages:
             mandatory: false
           task_id:
             link: taskExecutionID/value
+            schema: string
+            mandatory: false
+          task_type:
+            const: TRAINING
             schema: string
             mandatory: false
         out:

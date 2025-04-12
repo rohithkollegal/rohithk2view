@@ -10,6 +10,26 @@
                     "dependsOnList": [],
                     "isLast": 0,
                     "actors": [
+                         {
+                            "name": "Get TDMDB Schema",
+                            "actorType": {
+                                "parentType": "InnerFlow",
+                                "inputs": [
+                                    {
+                                        "name": "flowName",
+                                        "const": "getTDMDBSchema"
+                                    }
+                                ],
+                                "outputs": [
+                                    {
+                                        "name": "schema",
+                                        "schema": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
                         {
                             "name": "parent_row",
                             "actorType": {
@@ -83,8 +103,7 @@
                     "name": "Set Parent & Sequential Fields",
                     "dependsOnList": [],
                     "isLast": 0,
-                    "actors": [
-					
+                    "actors": [	
 						{{#if TABLE_PARENT_FIELDS}}
 						{{#each TABLE_PARENT_FIELDS~}}
 						{
@@ -140,7 +159,9 @@
                                     },
                                     {
                                         "name": "interface",
-                                        "const": "{{getSeqCacheInterface __LU_NAME}}"
+                                        "schema": {
+                                            "type": "string"
+                                        }
                                     },
                                     {
                                         "name": "TTL",
@@ -173,7 +194,6 @@
                                         "editor": {
                                             "id": "com.k2view.interface",
                                             "interfaceType": [
-                                                "REDIS",
                                                 "database"
                                             ],
                                             "interfaces": [
@@ -197,6 +217,12 @@
                                             "type": "number"
                                         },
                                         "mandatory": false
+                                    },
+                                    {
+                                        "name": "sequenceSchema",
+                                        "schema": {
+                                            "type": "string"
+                                        }
                                     }
                                 ],
                                 "outputs": [
@@ -577,6 +603,26 @@
 		,
 		{{/if}}
         {{#each TABLE_SEQ_DATA~}}
+        {
+            "leftPort": {
+                "actor": "Get TDMDB Schema",
+                "name": "schema"
+            },
+            "rightPort": {
+                "actor": "{{getFabricFieldName this}}",
+                "name": "sequenceSchema"
+            }
+        },
+        {
+            "leftPort": {
+                "actor": "Get SEQ_CACHE_INTERFACE",
+                "name": "result"
+            },
+            "rightPort": {
+                "actor": "{{getFabricFieldName this}}",
+                "name": "interface"
+            }
+        },
         {
             "leftPort": {
                 "actor": "{{getFabricFieldName this}}",
