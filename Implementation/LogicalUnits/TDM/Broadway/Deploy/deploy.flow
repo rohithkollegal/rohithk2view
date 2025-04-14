@@ -141,28 +141,6 @@ stages:
         in:
           flowName:
             const: TDMDBUpgradeScripts
-  'Create Postgres Databases ':
-    actors:
-      createPGDBS:
-        parent: InnerFlow
-        in:
-          flowName:
-            const: createPGDBS
-          is_first_deploy:
-            external: is_first_deploy
-            schema: boolean
-            mandatory: false
-  Populate Postgres Databases:
-    actors:
-      populatePGDBS:
-        parent: InnerFlow
-        in:
-          flowName:
-            const: populatePGDBS
-          is_first_deploy:
-            external: is_first_deploy
-            schema: boolean
-            mandatory: false
   Get Globals For k2masking:
     actors:
       SEQ_CACHE_INTERFACE:
