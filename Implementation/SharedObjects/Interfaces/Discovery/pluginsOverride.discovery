@@ -11,7 +11,7 @@
     "pluginsOverride" : {
       "Classification PII Marker" : {
         "inputParameters" : {
-          "fieldNameExcludeList" : [ "(?)ADD.*ID" ]
+          "fieldNameExcludeList" : [ "(?i)ADD.*ID" ]
         }
       }
     },
