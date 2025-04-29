@@ -7,7 +7,7 @@
             "const": [
                 {
                     "schema_name": "TDMDB_SCHEMA",
-                    "schema_value": "k2tdm_${ClusterID}"
+                    "schema_value": "public"
                 }
             ],
             "schema": {
