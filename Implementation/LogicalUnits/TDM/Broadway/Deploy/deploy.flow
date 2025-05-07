@@ -176,8 +176,8 @@ stages:
               interfaceType:
               - database
               - CassandraLoader
-              interfaces: [
-                ]
+              interfaces:
+              - fabric
             mandatory: false
           dropKeySpace:
             link: SEQ_DROP_KEYSPACE/result
