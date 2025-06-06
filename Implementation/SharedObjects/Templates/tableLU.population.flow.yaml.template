@@ -5,8 +5,8 @@ stages:
         parent: PopulationArgs
         readonly: true{{#if inputArgs}}
         in:{{#each inputArgs}}
-          {{this}}:
-            external: {{this}}
+          {{{this}}}:
+            external: {{{this}}}
             schema: any
             mandatory: false{{/each}}{{/if}}
       SyncDeleteMode:
@@ -79,7 +79,7 @@ stages:
   LU Table:
     last: 1
     actors:
-      {{luTable}}:
+      {{{luTable}}}:
         parent: DbLoad
         in:
           interface:
@@ -93,17 +93,17 @@ stages:
           fields:
             const:
             {{#each luTableColumns}}
-            - {{this}}
+            - {{{this}}}
             {{/each}}
           keys:
             const:
             {{#each luTableKeys}}
-            - {{this}}
+            - {{{this}}}
             {{/each}}
           dialect:
             const: sqlite
           {{#each luTableColumns}}
-          {{this}}:
+          {{{this}}}:
             schema: any
           {{/each}}
           params:
@@ -117,7 +117,7 @@ stages:
     type: object
     properties:
       {{#each sourceQueryOutputs}}
-      {{this}}:
+      {{{this}}}:
         type: {
           }
       {{/each}}
